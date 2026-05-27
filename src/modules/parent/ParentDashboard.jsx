@@ -45,23 +45,25 @@ const ParentDashboard = () => {
           data.mobileNumber,
         );
         setParentData(data);
-        if (data.children?.length > 0) {
-          setChildren(data.children);
-          const storedChildId = localStorage.getItem("selectedChildId");
-          const isChildValid = data.children.some(
-            (child) => child.id === storedChildId,
-          );
-
-          const initialChildId = isChildValid
-            ? storedChildId
-            : data.children[0].id;
-          setSelectedChildId(initialChildId);
-          localStorage.setItem("selectedChildId", initialChildId);
-        } else {
-          setChildren([]);
-          setSelectedChildId(null);
-          localStorage.removeItem("selectedChildId");
-        }
+          if (data.children && data.children.length > 0) {
+            setChildren(data.children);
+            const storedChildId = localStorage.getItem("selectedChildId");
+            // Use String() to prevent integer vs string comparison bugs
+            const isChildValid = data.children.some(
+              (child) => String(child.id) === String(storedChildId)
+            );
+  
+            const initialChildId = isChildValid
+              ? storedChildId
+              : String(data.children[0].id);
+            
+            setSelectedChildId(initialChildId);
+            localStorage.setItem("selectedChildId", initialChildId);
+          } else {
+            setChildren([]);
+            setSelectedChildId(null);
+            localStorage.removeItem("selectedChildId");
+          }
       } catch (err) {
         console.error("[DASHBOARD] Fetch failed:", err);
       } finally {
@@ -71,7 +73,7 @@ const ParentDashboard = () => {
     fetchData();
   }, []);
 
-  const selectedChild = children.find((c) => c.id === selectedChildId);
+  const selectedChild = children.find((c) => String(c.id) === String(selectedChildId));
 
   useEffect(() => {
     const fetchETA = async () => {
@@ -181,7 +183,7 @@ const ParentDashboard = () => {
                 localStorage.setItem("selectedChildId", child.id);
               }}
               className={`px-8 py-3 rounded-[16px] text-xs font-black uppercase tracking-wider transition-all shrink-0 active:scale-95 ${
-                selectedChildId === child.id
+                String(selectedChildId) === String(child.id)
                   ? "bg-[#88B04B] text-white"
                   : "bg-white text-slate-500 border border-slate-200"
               }`}
