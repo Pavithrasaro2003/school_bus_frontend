@@ -39,10 +39,24 @@ const ParentManagement = () => {
 
   const fetchParents = async () => {
     try {
+      console.log('[ParentManagement] Fetching parents from /parents...');
       const response = await api.get('/parents');
-      setParents(response.data.data || []);
+      console.log('[ParentManagement] Raw API response status:', response.status);
+      console.log('[ParentManagement] Raw API response.data:', JSON.stringify(response.data, null, 2).substring(0, 1000));
+      console.log('[ParentManagement] response.data.data type:', typeof response.data?.data);
+      console.log('[ParentManagement] response.data.data is array:', Array.isArray(response.data?.data));
+      console.log('[ParentManagement] response.data.results:', response.data?.results);
+      
+      const parentData = response.data.data || [];
+      console.log(`[ParentManagement] Setting ${parentData.length} parents in state`);
+      if (parentData.length > 0) {
+        console.log('[ParentManagement] First parent:', JSON.stringify(parentData[0], null, 2).substring(0, 500));
+      }
+      setParents(parentData);
     } catch (error) {
-      console.error('Error fetching parents:', error);
+      console.error('[ParentManagement] Error fetching parents:', error);
+      console.error('[ParentManagement] Error response:', error.response?.data);
+      console.error('[ParentManagement] Error status:', error.response?.status);
     } finally {
       setLoading(false);
     }
